@@ -1,0 +1,30 @@
+﻿<Window x:Class="HOICK.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HOICK"
+        mc:Ignorable="d"
+        Title="HOI Creation Kit" Height="450" Width="800">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Button Grid.Row="1" Grid.Column="1" Content="{DynamicResource m_CreateNewMod}" Click="NewProject_Click"/>
+        <Button Grid.Row="2" Grid.Column="1" Content="{DynamicResource m_OpenMod}"/>
+        <Menu Grid.Row="3" Grid.Column="1">
+            <MenuItem x:Name="menuLanguage" Header="{DynamicResource m_ChangeLanguage}" />
+        </Menu>
+    </Grid>
+</Window>

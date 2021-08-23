@@ -1,0 +1,34 @@
+﻿<Window x:Class="HOICK.DialogWindows.NewFocusTreeSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HOICK.DialogWindows"
+        mc:Ignorable="d"
+        Title="{DynamicResource CreateFocusTree}"
+        SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <StackPanel>
+            <Label Content="{DynamicResource ID}"/>
+            <TextBox TextWrapping="NoWrap" AcceptsReturn="False" x:Name="ID"/>
+            
+            <Label Content="{DynamicResource Country}" />
+            <ComboBox x:Name="FTCountryTag"/>
+
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="ResetOnCivwar"/>
+                <Label Content="{DynamicResource ResetOnCivwar}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="IsFTDefault" Checked="IsFTDefault_Checked" />
+                <Label Content="{DynamicResource DefaultFT}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{DynamicResource Create}" x:Name="CreateFocusTree" Click="CreateFocusTree_Click" IsDefault="True" />
+                <Button Content="{DynamicResource Cancel}" IsCancel="True" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

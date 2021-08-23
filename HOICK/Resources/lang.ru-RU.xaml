@@ -1,0 +1,44 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:v="clr-namespace:System;assembly=mscorlib">
+    <v:String x:Key="m_CreateNewMod">Новый Проект</v:String>
+    <v:String x:Key="m_OpenMod">Открыть Проект</v:String>
+    <v:String x:Key="m_ChangeLanguage">Язык</v:String>
+    
+    <v:String x:Key="ModName">Название мода:</v:String>
+    <v:String x:Key="ModDescription">Описание мода:</v:String>
+    <v:String x:Key="ModTags">Теги мода:</v:String>
+    <v:String x:Key="ModVersion">Поддерживаемая версия:</v:String>
+    <v:String x:Key="ModPreview">Превью мода:</v:String>
+    
+    <v:String x:Key="Create">Создать</v:String>
+    <v:String x:Key="Cancel">Отмена</v:String>
+    
+    <v:String x:Key="Focuses">Фокусы</v:String>
+    <v:String x:Key="Events">Ивенты</v:String>
+    <v:String x:Key="Map">Карта</v:String>
+    <v:String x:Key="Music">Музыка</v:String>
+    <v:String x:Key="Ideas">Идеи</v:String>
+    <v:String x:Key="OnActions">On Actions</v:String>
+    <v:String x:Key="Modifiers">Модификаторы</v:String>
+    <v:String x:Key="Countries">Государства</v:String>
+    <v:String x:Key="Country">Государство</v:String>
+
+    <v:String x:Key="CreateFocus">Новый фокус</v:String>
+    <v:String x:Key="FocusTrees">Дерево фокусов</v:String>
+
+    <v:String x:Key="CreateFocusTree">New focus tree</v:String>
+
+    <v:String x:Key="ID">ID</v:String>
+    <v:String x:Key="Name">Название</v:String>
+    <v:String x:Key="Description">Описание</v:String>
+    <v:String x:Key="Icon">Иконка</v:String>
+    <v:String x:Key="Duration">Длительность</v:String>
+    <v:String x:Key="SearchFilters">Поисковые фильтры</v:String>
+    <v:String x:Key="Days">Дней</v:String>
+    <v:String x:Key="AvailableIfCapitulated">Доступно после капитуляции</v:String>
+    <v:String x:Key="CancelIfInvalid">Прекращать, если не выполняются условия</v:String>
+    <v:String x:Key="DefaultFT">Общее</v:String>
+    <v:String x:Key="ResetOnCivwar">Сбрасывать при гражданке</v:String>
+
+</ResourceDictionary>
