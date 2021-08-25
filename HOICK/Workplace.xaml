@@ -56,7 +56,9 @@
                     </StackPanel>
                     <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
-                    <Canvas Grid.Column="2" x:Name="FocusCanvas">
+                    <Canvas Grid.Column="2" x:Name="FocusCanvas"
+                            PreviewMouseMove="FocusCanvas_PreviewMouseMove"
+                            PreviewMouseUp="FocusCanvas_PreviewMouseUp">
                     </Canvas>
 
                     <GridSplitter Grid.Column="3" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />

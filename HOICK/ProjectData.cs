@@ -34,6 +34,15 @@ namespace HOICK
 
         public string Code;
 
+        private void Focus_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Workplace.DragObject = sender as UIElement;
+            Workplace.offset = e.GetPosition(Workplace.FocusCanvasPublic);
+            Workplace.offset.Y -= Canvas.GetTop(Workplace.DragObject);
+            Workplace.offset.X -= Canvas.GetLeft(Workplace.DragObject);
+            Workplace.FocusCanvasPublic.CaptureMouse();
+        }
+
         public void Render(Canvas canvas)
         {
             /*
@@ -49,6 +58,7 @@ namespace HOICK
 
             UserControls.NationalFocusControl f = new UserControls.NationalFocusControl();
             f.FocusName = NameLocalizations[App.Language.Name];
+            f.PreviewMouseDown += Focus_PreviewMouseDown;
             _ = canvas.Children.Add(f);
         }
     }

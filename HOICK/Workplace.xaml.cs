@@ -20,6 +20,10 @@ namespace HOICK
     public partial class Workplace : Window
     {
         private FocusTree CurrentFocusTree;
+        public static UIElement DragObject = null;
+        public static Point offset;
+
+        public static Canvas FocusCanvasPublic;
 
         public void UpdateFocusCanvas()
         {
@@ -36,6 +40,7 @@ namespace HOICK
             {
                 FocusMainTools.IsEnabled = false;
             }
+            FocusCanvasPublic = FocusCanvas;
         }
 
         private void CreateFocus_Click(object sender, RoutedEventArgs e)
@@ -87,6 +92,22 @@ namespace HOICK
             }
             CurrentFocusTree = ProjectData.FocusTrees.FirstOrDefault(i => i.Id == FocusTreeInput.SelectedItem.ToString());
         }
-        
+
+        private void FocusCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (DragObject == null)
+            {
+                return;
+            }
+            Point position = e.GetPosition(sender as IInputElement);
+            Canvas.SetTop(DragObject, position.Y - offset.Y);
+            Canvas.SetLeft(DragObject, position.X - offset.X);
+        }
+
+        private void FocusCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            DragObject = null;
+            FocusCanvasPublic.ReleaseMouseCapture();
+        }
     }
 }
