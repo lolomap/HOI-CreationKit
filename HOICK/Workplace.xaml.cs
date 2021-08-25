@@ -23,8 +23,6 @@ namespace HOICK
         public static UIElement DragObject = null;
         public static Point offset;
 
-        public static Canvas FocusCanvasPublic;
-
         public void UpdateFocusCanvas()
         {
             foreach (NationalFocus focus in CurrentFocusTree.Focuses)
@@ -40,7 +38,6 @@ namespace HOICK
             {
                 FocusMainTools.IsEnabled = false;
             }
-            FocusCanvasPublic = FocusCanvas;
         }
 
         private void CreateFocus_Click(object sender, RoutedEventArgs e)
@@ -107,7 +104,7 @@ namespace HOICK
         private void FocusCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             DragObject = null;
-            FocusCanvasPublic.ReleaseMouseCapture();
+            FocusCanvas.ReleaseMouseCapture();
         }
     }
 }

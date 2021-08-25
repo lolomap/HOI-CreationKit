@@ -37,10 +37,10 @@ namespace HOICK
         private void Focus_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             Workplace.DragObject = sender as UIElement;
-            Workplace.offset = e.GetPosition(Workplace.FocusCanvasPublic);
+            Workplace.offset = e.GetPosition(Application.Current.MainWindow.FindName("FocusCanvas") as Canvas);
             Workplace.offset.Y -= Canvas.GetTop(Workplace.DragObject);
             Workplace.offset.X -= Canvas.GetLeft(Workplace.DragObject);
-            Workplace.FocusCanvasPublic.CaptureMouse();
+            _ = (Application.Current.MainWindow.FindName("FocusCanvas") as Canvas).CaptureMouse();
         }
 
         public void Render(Canvas canvas)
