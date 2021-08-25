@@ -38,8 +38,9 @@ namespace HOICK
         {
             Workplace.DragObject = sender as UIElement;
             Workplace.offset = e.GetPosition(Application.Current.MainWindow.FindName("FocusCanvas") as Canvas);
-            Workplace.offset.Y -= Canvas.GetTop(Workplace.DragObject);
-            Workplace.offset.X -= Canvas.GetLeft(Workplace.DragObject);
+            Vector p = VisualTreeHelper.GetOffset(Workplace.DragObject);
+            Workplace.offset.X -= p.X;
+            Workplace.offset.Y -= p.Y;
             _ = (Application.Current.MainWindow.FindName("FocusCanvas") as Canvas).CaptureMouse();
         }
 
