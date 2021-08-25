@@ -24,7 +24,7 @@ namespace HOICK
         public string Id, Icon, WillLeadToWarWith;
 
         public int Cost;
-        public Tuple<int, int> Position;
+        public Tuple<double, double> Position = new Tuple<double, double>(0, 0);
 
         public List<Tuple<string, bool>> Prerequisites;
         public List<string> MutuallyExclusive, SearchFilters;
@@ -33,6 +33,21 @@ namespace HOICK
         public bool AvailableIfCapitulated, CancelIfInvalid;
 
         public string Code;
+
+        public void Render(Canvas canvas)
+        {
+            UserControls.NationalFocusControl f = new UserControls.NationalFocusControl
+            {
+                FocusName = NameLocalizations[App.Language.Name]
+            };
+            f.PreviewMouseDown += Focus_PreviewMouseDown;
+            f.PreviewMouseUp += Focus_PreviewMouseUp;
+
+            Canvas.SetLeft(f, Position.Item1);
+            Canvas.SetTop(f, Position.Item2);
+
+            _ = canvas.Children.Add(f);
+        }
 
         private void Focus_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -44,23 +59,12 @@ namespace HOICK
             _ = (Application.Current.MainWindow.FindName("FocusCanvas") as Canvas).CaptureMouse();
         }
 
-        public void Render(Canvas canvas)
+        private void Focus_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            /*
-            Grid gr = new Grid();
-            Label fn = new Label() {
-                Content = NameLocalizations[App.Language.Name],
-                Background = Brushes.Gray
-            };
-            _ = gr.Children.Add(fn);
-
-            _ = canvas.Children.Add(gr);
-            */
-
-            UserControls.NationalFocusControl f = new UserControls.NationalFocusControl();
-            f.FocusName = NameLocalizations[App.Language.Name];
-            f.PreviewMouseDown += Focus_PreviewMouseDown;
-            _ = canvas.Children.Add(f);
+            UIElement ui = sender as UIElement;
+            Point pos = e.GetPosition(Application.Current.MainWindow.FindName("FocusCanvas") as Canvas);
+            Vector p = VisualTreeHelper.GetOffset(ui);
+            Position = new Tuple<double, double>(pos.X - p.X, pos.Y - p.Y);
         }
     }
 

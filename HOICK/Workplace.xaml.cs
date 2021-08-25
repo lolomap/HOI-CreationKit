@@ -25,6 +25,7 @@ namespace HOICK
 
         public void UpdateFocusCanvas()
         {
+            FocusCanvas.Children.Clear();
             foreach (NationalFocus focus in CurrentFocusTree.Focuses)
             {
                 focus.Render(FocusCanvas);
@@ -55,8 +56,9 @@ namespace HOICK
                     AvailableIfCapitulated = newFocusDialog.aic.GetValueOrDefault(),
                     CancelIfInvalid = newFocusDialog.cii.GetValueOrDefault()
                 };
+                newFocus.Render(FocusCanvas);
                 CurrentFocusTree.Focuses.Add(newFocus);
-                UpdateFocusCanvas();
+                //UpdateFocusCanvas();
             }
         }
 
@@ -88,6 +90,7 @@ namespace HOICK
                 FocusMainTools.IsEnabled = true;
             }
             CurrentFocusTree = ProjectData.FocusTrees.FirstOrDefault(i => i.Id == FocusTreeInput.SelectedItem.ToString());
+            UpdateFocusCanvas();
         }
 
         private void FocusCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -97,8 +100,11 @@ namespace HOICK
                 return;
             }
             Point position = e.GetPosition(sender as IInputElement);
-            Canvas.SetTop(DragObject, position.Y - offset.Y);
-            Canvas.SetLeft(DragObject, position.X - offset.X);
+            if (position.Y - offset.Y > 0 && position.X - offset.X > 0)
+            {
+                Canvas.SetTop(DragObject, position.Y - offset.Y);
+                Canvas.SetLeft(DragObject, position.X - offset.X);
+            }
         }
 
         private void FocusCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
