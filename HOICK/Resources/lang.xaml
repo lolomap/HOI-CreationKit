@@ -11,7 +11,11 @@
     <v:String x:Key="ModTags">Mod tags:</v:String>
     <v:String x:Key="ModVersion">Supported version:</v:String>
     <v:String x:Key="ModPreview">Picture:</v:String>
-    
+    <v:String x:Key="CreateProjectError">Mod name is empty or mod with this name is already exists in your mod folder</v:String>
+
+    <v:String x:Key="DescriptorError">Error in descriptor file</v:String>
+    <v:String x:Key="FocusesLoadError">National focuses loading failed</v:String>
+
     <v:String x:Key="Create">Create</v:String>
     <v:String x:Key="Cancel">Cancel</v:String>
     

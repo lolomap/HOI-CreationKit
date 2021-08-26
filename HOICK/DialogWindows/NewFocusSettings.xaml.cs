@@ -31,6 +31,12 @@ namespace HOICK.DialogWindows
             aic = availableIfCapitulatedInput.IsChecked;
             cii = cancelIfInvalidInput.IsChecked;
 
+            if (id == string.Empty)
+            {
+                System.Media.SystemSounds.Beep.Play();
+                return;
+            }
+
             DialogResult = true;
         }
     }

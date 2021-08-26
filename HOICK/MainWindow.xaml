@@ -22,7 +22,7 @@
         </Grid.ColumnDefinitions>
 
         <Button Grid.Row="1" Grid.Column="1" Content="{DynamicResource m_CreateNewMod}" Click="NewProject_Click"/>
-        <Button Grid.Row="2" Grid.Column="1" Content="{DynamicResource m_OpenMod}"/>
+        <Button Grid.Row="2" Grid.Column="1" Content="{DynamicResource m_OpenMod}" Click="OpenProject_Click"/>
         <Menu Grid.Row="3" Grid.Column="1">
             <MenuItem x:Name="menuLanguage" Header="{DynamicResource m_ChangeLanguage}" />
         </Menu>

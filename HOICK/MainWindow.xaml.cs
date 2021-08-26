@@ -94,5 +94,59 @@ namespace HOICK
                 Application.Current.MainWindow.Show();
             }
         }
+
+        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog()
+            {
+                DefaultExt = ".mod",
+                Filter = "HOI4 mod descriptor (.mod)|*.mod"
+            };
+
+            bool isLoaded = false;
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string dpath = openFileDialog.FileName;
+                string path;
+                using (StreamReader descriptorF = new StreamReader(dpath))
+                {
+                    string[] fd = descriptorF.ReadToEnd().Split('\n');
+                    foreach (string line in fd)
+                    {
+                        if (line.StartsWith("path=\""))
+                        {
+                            path = line.Split('"')[1];
+                            if (path.StartsWith("mod/"))
+                            {
+                                path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                                    "/Paradox Interactive/Hearts of Iron IV/" + path;
+                            }
+                            isLoaded = LoadMod(path);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (isLoaded)
+            {
+                Visibility = Visibility.Hidden;
+                Application.Current.MainWindow = new Workplace();
+                Application.Current.MainWindow.Show();
+            }
+        }
+
+        private bool LoadMod(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                System.Media.SystemSounds.Beep.Play();
+                _ = MessageBox.Show(Application.Current.Resources["DescriptorError"] as string);
+                return false;
+            }
+
+            ProjectData.LoadFocusTrees(path);
+
+            return true;
+        }
     }
 }

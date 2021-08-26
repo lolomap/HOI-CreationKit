@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using System.IO;
+using System;
 
 namespace HOICK.DialogWindows
 {
@@ -33,9 +23,13 @@ namespace HOICK.DialogWindows
             description = descInput.Text;
             tags = tagsInput.Text.Split(';');
 
-            if (name == "")
+            if (name == string.Empty || File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                    "/Paradox Interactive/Hearts of Iron IV/mod/" + name + ".mod"))
             {
-                DialogResult = false;
+                System.Media.SystemSounds.Beep.Play();
+
+                _ = MessageBox.Show(Application.Current.Resources["CreateProjectError"] as string);
+
                 return;
             }
             DialogResult = true;

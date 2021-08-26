@@ -10,7 +10,11 @@
     <v:String x:Key="ModTags">Теги мода:</v:String>
     <v:String x:Key="ModVersion">Поддерживаемая версия:</v:String>
     <v:String x:Key="ModPreview">Превью мода:</v:String>
-    
+    <v:String x:Key="CreateProjectError">Отсутствует название мода, или мод с таким названием уже существует в папке mod</v:String>
+
+    <v:String x:Key="DescriptorError">Ошибка в файле дескриптора</v:String>
+    <v:String x:Key="FocusesLoadError">Ошибка при загрузке национальных фокусов</v:String>
+
     <v:String x:Key="Create">Создать</v:String>
     <v:String x:Key="Cancel">Отмена</v:String>
     

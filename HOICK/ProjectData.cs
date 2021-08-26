@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,6 +38,11 @@ namespace HOICK
 
         public void Render(Canvas canvas)
         {
+            string fuiname = NameLocalizations[App.Language.Name];
+            if (fuiname == string.Empty)
+            {
+                fuiname = Id;
+            }
             UserControls.NationalFocusControl f = new UserControls.NationalFocusControl
             {
                 FocusName = NameLocalizations[App.Language.Name]
@@ -81,5 +88,27 @@ namespace HOICK
     {
         public static List<FocusTree> FocusTrees = new List<FocusTree>();
         public static List<Country> Countries = new List<Country>();
+
+        public static bool LoadFocusTrees(string path)
+        {
+            path += "/common/national_focus";
+            if (!Directory.Exists(path))
+            {
+                System.Media.SystemSounds.Beep.Play();
+                _ = MessageBox.Show(Application.Current.Resources["FocusesLoadError"] as string);
+                return false;
+            }
+
+            string[] files = Directory.GetFiles(path);
+            foreach (string file in files)
+            {
+                using (StreamReader f = new StreamReader(file))
+                {
+                    
+                }
+            }
+
+            return true;
+        }
     }
 }
