@@ -8,6 +8,40 @@ namespace HOICK
 {
     public class HOIParser
     {
+        private LexicAnalizer la = new LexicAnalizer();
+        private SyntaxAnalizer sa = new SyntaxAnalizer();
+
+        public void Parse(string raw)
+        {
+            List<Lexem> L = la.Run(raw);
+            sa.Run(L, la.BlockSignIndexes);
+        }
+    }
+
+    public class SyntaxAnalizer
+    {
+        private void BlockAssign(List<Lexem> lexems, List<int> BSLs)
+        {
+            int depth = 0;
+            for (int i = 0; i < lexems.Count; i++)
+            {
+                if (lexems[i].Type == Lexem.LexemType.BlockSign)
+                {
+                    depth++;
+
+                    int lastBsl = BSLs[BSLs.Count - depth];
+                    for (int j = i; j <= lastBsl; j++)
+                    {
+                        lexems[j].AssignBlock(depth);
+                    }
+                }
+            }
+        }
+
+        public void Run(List<Lexem> lexems, List<int> BSLs)
+        {
+            BlockAssign(lexems, BSLs);
+        }
     }
 
     public class LexicAnalizer
@@ -50,11 +84,13 @@ namespace HOICK
             "ai_will_do"
         };
 
-        private string Operators = "=+-\"{}";
+        private string Operators = "=+-\"";
+        private string BlockSigns = "{}";
 
         private string Spaces = " \n\r\t";
 
         private List<Lexem> Lexems = new List<Lexem>();
+        public List<int> BlockSignIndexes = new List<int>();
 
         private string StyleIgnor(string data)
         {
@@ -87,21 +123,30 @@ namespace HOICK
             foreach(char sym in data)
             {
                 bool isOperator = Operators.Contains(sym);
-                if ((sym == ' ' || isOperator) && lexem != string.Empty)
+                bool isBlockS = BlockSigns.Contains(sym);
+                if (sym == ' ' || isOperator || isBlockS)
                 {
-                    if (KeyWords.Contains(lexem))
+                    if (lexem != string.Empty)
                     {
-                        Lexems.Add(new Lexem(lexem, Lexem.LexemType.KeyWord));
+                        if (KeyWords.Contains(lexem))
+                        {
+                            Lexems.Add(new Lexem(lexem, Lexem.LexemType.KeyWord));
+                        }
+                        else
+                        {
+                            Lexems.Add(new Lexem(lexem));
+                        }
+                        lexem = "";
                     }
-                    else
-                    {
-                        Lexems.Add(new Lexem(lexem));
-                    }
-                    lexem = "";
 
                     if (isOperator)
                     {
                         Lexems.Add(new Lexem(sym, Lexem.LexemType.Operator));
+                    }
+                    else if (isBlockS)
+                    {
+                        Lexems.Add(new Lexem(sym, Lexem.LexemType.BlockSign));
+                        BlockSignIndexes.Add(Lexems.Count - 1);
                     }
 
                     continue;
@@ -110,7 +155,7 @@ namespace HOICK
             }
         }
 
-        public List<Lexem> Parse(string data)
+        public List<Lexem> Run(string data)
         {
             data = StyleIgnor(data);
             LexemsWrite(data);
@@ -126,24 +171,32 @@ namespace HOICK
             Unknown,
             Number,
             KeyWord,
-            Operator
+            Operator,
+            BlockSign
         }
-        public LexemType type { private set; get; }
+        public LexemType Type { private set; get; }
         public object Value { private set; get; }
+        public int Block { private set; get; }
+
+        public void AssignBlock(int block)
+        {
+            Block = block;
+        }
 
         public Lexem(object value, LexemType type = LexemType.Unknown)
         {
-            this.type = type;
+            Type = type;
+            Block = 0;
 
             if (int.TryParse(value as string, out int i))
             {
                 Value = i;
-                this.type = LexemType.Number;
+                Type = LexemType.Number;
             }
             else if (float.TryParse(value as string, out float f))
             {
                 Value = f;
-                this.type = LexemType.Number;
+                Type = LexemType.Number;
             }
             else
             {

@@ -108,7 +108,7 @@ namespace HOICK
                 using (StreamReader f = new StreamReader(file))
                 {
                     string data = f.ReadToEnd();
-                    new LexicAnalizer().Parse(data);
+                    new HOIParser().Parse(data);
                 }
             }
 
