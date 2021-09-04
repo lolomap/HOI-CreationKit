@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace HOICK
             }
             UserControls.NationalFocusControl f = new UserControls.NationalFocusControl
             {
-                FocusName = NameLocalizations[App.Language.Name]
+                FocusName = fuiname
             };
             f.PreviewMouseDown += Focus_PreviewMouseDown;
             f.PreviewMouseUp += Focus_PreviewMouseUp;
@@ -89,6 +90,8 @@ namespace HOICK
         public static List<FocusTree> FocusTrees = new List<FocusTree>();
         public static List<Country> Countries = new List<Country>();
 
+       
+
         public static bool LoadFocusTrees(string path)
         {
             path += "/common/national_focus";
@@ -104,7 +107,8 @@ namespace HOICK
             {
                 using (StreamReader f = new StreamReader(file))
                 {
-                    
+                    string data = f.ReadToEnd();
+                    new LexicAnalizer().Parse(data);
                 }
             }
 

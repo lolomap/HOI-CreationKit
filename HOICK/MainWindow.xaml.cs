@@ -118,7 +118,7 @@ namespace HOICK
                             path = line.Split('"')[1];
                             if (path.StartsWith("mod/"))
                             {
-                                path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+                                path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).Replace('\\', '/') +
                                     "/Paradox Interactive/Hearts of Iron IV/" + path;
                             }
                             isLoaded = LoadMod(path);
