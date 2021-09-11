@@ -24,34 +24,50 @@ namespace HOICK
         private void BlockAssign(LexemCollection lexems)
         {
             int depth = 0;
+            int maxDepth = 0;
             for (int i = 0; i < lexems.collection.Count; i++)
             {
-                if (lexems.collection[i].Type == Lexem.LexemType.BlockSign)
+                if (lexems.collection[i].Type == Lexem.LexemType.BlockSign && (char)lexems.collection[i].Value == '{')
                 {
+                    lexems.collection[i].AssignBlock(depth);
                     depth++;
+                }
+                else if (lexems.collection[i].Type == Lexem.LexemType.BlockSign && (char)lexems.collection[i].Value == '}')
+                {
+                    depth--;
+                    lexems.collection[i].AssignBlock(depth);
+                }
+                else
+                {
+                    lexems.collection[i].AssignBlock(depth);
+                }
 
-                    int lastBsl = lexems.BlockSignIndexes[lexems.BlockSignIndexes.Count - depth];
-                    for (int j = i; j <= lastBsl; j++)
-                    {
-                        lexems.collection[j].AssignBlock(depth);
-                        
-                        if (lexems.DepthAssignedCollection.ContainsKey(depth))
-                        {
-                            lexems.DepthAssignedCollection[depth].Add(lexems.collection[j]);
-                        }
-                        else
-                        {
-                            lexems.DepthAssignedCollection.Add(depth, new List<Lexem>() { lexems.collection[j] });
-                        }
-                    }
+                if (depth > maxDepth)
+                {
+                    maxDepth = depth;
                 }
             }
-            lexems.MaxDepth = depth;
+            lexems.MaxDepth = maxDepth;
+
+            lexems.DepthAssignedCollection.Add(0, new List<Lexem>());
+            foreach (Lexem lexem in lexems.collection)
+            {
+                if (lexems.DepthAssignedCollection.ContainsKey(lexem.Block))
+                {
+                    lexems.DepthAssignedCollection[lexem.Block].Add(lexem);
+                }
+                else
+                {
+                    lexems.DepthAssignedCollection.Add(lexem.Block, new List<Lexem>() { lexem });
+                }
+            }
         }
 
         public void Run(LexemCollection lexems)
         {
             BlockAssign(lexems);
+            AST ast = new AST();
+            ast.GenerateSyntaxTree(lexems);
         }
     }
 
@@ -95,7 +111,7 @@ namespace HOICK
             "ai_will_do"
         };
 
-        private string Operators = "=+-\"";
+        private string Operators = "=><";
         private string BlockSigns = "{}";
 
         private string Spaces = " \n\r\t";
@@ -155,7 +171,10 @@ namespace HOICK
                     else if (isBlockS)
                     {
                         Lexems.collection.Add(new Lexem(sym, Lexem.LexemType.BlockSign));
-                        Lexems.BlockSignIndexes.Add(Lexems.collection.Count - 1);
+                        if (sym == '}')
+                        {
+                            Lexems.CloseBlockSignsIndexes.Add(Lexems.collection.Count - 1);
+                        }
                     }
 
                     continue;
@@ -178,19 +197,17 @@ namespace HOICK
     
     public class AST
     {
-        List<Tuple<SyntaxObj, SyntaxObj>> KeyValueObjs = new List<Tuple<SyntaxObj, SyntaxObj>>();
-
-        private object GeneratePairOrBlock(List<Lexem> lexems)
+        private SyntaxObj GenerateBlock(List<Lexem> lexems)
         {
-            List<Tuple<SyntaxObj, SyntaxObj>> res = new List<Tuple<SyntaxObj, SyntaxObj>>();
+            List<SyntaxPair> res = new List<SyntaxPair>();
 
-            for (int i = 0; i < lexems.Count; i += 3)
+            for (int i = 0; i < lexems.Count - 2; i += 3)
             {
                 if (lexems[i].Type == Lexem.LexemType.KeyWord || lexems[i].Type == Lexem.LexemType.Unknown)
                 {
                     if (lexems[i + 1].Type == Lexem.LexemType.Operator)
                     {
-                        if (lexems[i + 2].Type == Lexem.LexemType.Unknown)
+                        if (lexems[i + 2].Type == Lexem.LexemType.Unknown || lexems[i+2].Type == Lexem.LexemType.Number)
                         {
                             SyntaxObj root = new SyntaxObj();
                             root.SetValue(lexems[i].Value);
@@ -198,7 +215,42 @@ namespace HOICK
                             SyntaxObj child = new SyntaxObj();
                             child.SetValue(lexems[i + 2].Value);
 
-                            res.Add(new Tuple<SyntaxObj, SyntaxObj>(root, child));
+                            if ((char)lexems[i + 1].Value == '<')
+                            {
+                                res.Add(new SyntaxPair(root, child, SyntaxPair.OperatorType.Less));
+                            }
+                            else if ((char)lexems[i + 1].Value == '>')
+                            {
+                                res.Add(new SyntaxPair(root, child, SyntaxPair.OperatorType.More));
+                            }
+                            else
+                            {
+                                res.Add(new SyntaxPair(root, child));
+                            }
+                        }
+                        else if (lexems[i + 2].Type == Lexem.LexemType.BlockSign)
+                        {
+                            SyntaxObj root = new SyntaxObj();
+                            root.SetValue(lexems[i].Value);
+
+                            SyntaxObj child = new SyntaxObj
+                            {
+                                isBlock = true
+                            };
+                            child.SetValue("~&$BLOCK$&~");
+
+                            if ((char)lexems[i + 1].Value == '<')
+                            {
+                                res.Add(new SyntaxPair(root, child, SyntaxPair.OperatorType.Less));
+                            }
+                            else if ((char)lexems[i + 1].Value == '>')
+                            {
+                                res.Add(new SyntaxPair(root, child, SyntaxPair.OperatorType.More));
+                            }
+                            else
+                            {
+                                res.Add(new SyntaxPair(root, child));
+                            }
                         }
                         else
                         {
@@ -216,22 +268,82 @@ namespace HOICK
                 }
             }
 
+            SyntaxObj o = new SyntaxObj();
             if (res.Count == 1)
             {
-                return res[0];
+                o.SetValue(res[0]);
             }
             else
             {
-                SyntaxObj o = new SyntaxObj();
                 o.SetValue(res);
-                return o;
             }
+
+            return o;
 
         }
 
-        public List<Tuple<SyntaxObj, SyntaxObj>> GenerateTree(LexemCollection lexems)
+        //Return dictionary A: keys - depths, values - dictionary B. Dict B: keys - ids, values - blocks
+        private Dictionary<int, Dictionary<int, SyntaxObj>> GenerateDictionaryTree(LexemCollection lexems)
         {
+            //Tree with pointers to blocks instead of blocks. Keys are depths
+            Dictionary<int, Dictionary<int, SyntaxObj>> prepareDict = new Dictionary<int, Dictionary<int, SyntaxObj>>();
+            for (int i = 0; i < lexems.MaxDepth; i++)
+            {
+                //Generated for every depth. Keys are ids for blocks on same depth
+                Dictionary<int, SyntaxObj> res = new Dictionary<int, SyntaxObj>();
+
+                Dictionary<int, List<Lexem>> blocksInThisDepth = new Dictionary<int, List<Lexem>>();
+                int curblock = 0; //for next loop
+                bool blockLoad = true; //
+                List<Lexem> oneBlock = new List<Lexem>();
+
+                //Sort lexems for blocks on one depth
+                foreach (Lexem lex in lexems.DepthAssignedCollection[i])
+                {
+                    if (lex.Type == Lexem.LexemType.BlockSign && (char)lex.Value == '{' && !blockLoad)
+                    {
+                        curblock++;
+                    }
+                    else if (lex.Type == Lexem.LexemType.BlockSign && (char)lex.Value == '}')
+                    {
+                        blocksInThisDepth.Add(curblock, oneBlock);
+                        oneBlock = new List<Lexem>();
+                        blockLoad = false;
+                    }
+                    else
+                    {
+                        oneBlock.Add(lex);
+                    }
+                }
+
+                //Generate pairs from last lexems
+                for (int j = 0; j < blocksInThisDepth.Keys.Count; j++)
+                {
+                    if (!res.ContainsKey(j))
+                    {
+                        res.Add(j, GenerateBlock(blocksInThisDepth[j]));
+                    }
+                    else
+                    {
+                        res[j] = GenerateBlock(blocksInThisDepth[j]);
+                    }
+                }
+
+                prepareDict.Add(i, res);
+
+            }
+
+            return prepareDict;
+        }
+
+        public List<SyntaxPair> GenerateSyntaxTree(LexemCollection lexems)
+        {
+            List<SyntaxPair> KeyValueObjs = new List<SyntaxPair>();
+
+            Dictionary<int, Dictionary<int, SyntaxObj>> preparedData = GenerateDictionaryTree(lexems);
             
+
+            return null;
         }
 
         public void LogTree()
@@ -256,20 +368,37 @@ namespace HOICK
         {
             value = val;
         }
-        public void SetValue(List<string> vals)
-        {
-            value = vals;
-        }
     }
 
     public class LexemCollection
     {
         public List<Lexem> collection = new List<Lexem>();
-        public List<int> BlockSignIndexes = new List<int>();
+        public List<int> CloseBlockSignsIndexes = new List<int>();
         public Dictionary<int, List<Lexem>> DepthAssignedCollection = new Dictionary<int, List<Lexem>>();
         public int MaxDepth = 0;
     }
-    
+
+    public class SyntaxPair
+    {
+        public enum OperatorType
+        {
+            Equal,
+            Less,
+            More
+        }
+
+        public SyntaxObj Key;
+        public SyntaxObj Value;
+        public OperatorType Operator;
+
+        public SyntaxPair(SyntaxObj key, SyntaxObj value, OperatorType oper = OperatorType.Equal)
+        {
+            Key = key;
+            Value = value;
+            Operator = oper;
+        }
+    }
+
     public class Lexem
     {
         public enum LexemType
