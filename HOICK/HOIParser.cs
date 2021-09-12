@@ -15,7 +15,7 @@ namespace HOICK
         public void Parse(string raw)
         {
             LexemCollection L = la.Run(raw);
-            sa.Run(L);
+            SyntaxTree S = sa.Run(L);
         }
     }
 
@@ -63,11 +63,11 @@ namespace HOICK
             }
         }
 
-        public void Run(LexemCollection lexems)
+        public SyntaxTree Run(LexemCollection lexems)
         {
             BlockAssign(lexems);
             AST ast = new AST();
-            ast.GenerateSyntaxTree(lexems);
+            return ast.GenerateSyntaxTree(lexems);
         }
     }
 
@@ -336,25 +336,85 @@ namespace HOICK
             return prepareDict;
         }
 
-        public List<SyntaxPair> GenerateSyntaxTree(LexemCollection lexems)
+        public SyntaxTree GenerateSyntaxTree(LexemCollection lexems)
         {
-            List<SyntaxPair> KeyValueObjs = new List<SyntaxPair>();
+            SyntaxTree tree = new SyntaxTree();
 
             Dictionary<int, Dictionary<int, SyntaxObj>> preparedData = GenerateDictionaryTree(lexems);
-            
 
-            return null;
+            foreach (SyntaxObj roots in preparedData[0].Values)
+            {
+                if (roots.GetValue().GetType() == typeof(SyntaxPair))
+                {
+                    tree.AddRoot((SyntaxPair)roots.GetValue());
+                }
+                else if (roots.GetValue().GetType() == typeof(List<SyntaxPair>))
+                {
+                    tree.AddRoot((List<SyntaxPair>)roots.GetValue());
+                }
+            }
+
+            tree.AddChilds(preparedData[1]);
+            for (int i = 2; i < preparedData.Count; i++)
+            {
+                tree.AddSubChilds(preparedData[i]);
+            }
+
+            return tree;
+        }
+    }
+
+    public class SyntaxTree
+    {
+        private static int depth = 0;
+        private List<SyntaxPair> tree = new List<SyntaxPair>();
+
+        public void AddRoot(SyntaxPair pair)
+        {
+            tree.Add(pair);
+        }
+        public void AddRoot(List<SyntaxPair> pairs)
+        {
+            tree.AddRange(pairs);
         }
 
-        public void LogTree()
+        public void SetRoots(List<SyntaxPair> pairs)
         {
-            using (StreamWriter f = new StreamWriter("/logs/tree.txt"))
+            tree = pairs;
+        }
+
+        public void AddChilds(Dictionary<int, SyntaxObj> childs)
+        {
+            int i = 0;
+            foreach (SyntaxPair item in tree)
             {
+                if (item.Value.isBlock)
+                {
+                    item.Value.SetValue(childs[i]);
+                    i++;
+                }
+
 
             }
         }
+
+        public void AddSubChilds(Dictionary<int, SyntaxObj> childs)
+        {
+            depth++;
+
+            int i = 0;
+            foreach (SyntaxPair item in tree)
+            {
+                if (item.Value.isBlock)
+                {
+                    SyntaxPair neededObj = item.GetUndefinedBlockByDepth(depth);
+                    neededObj.Value.SetValue(childs[i]);
+                    i++;
+                }
+            }
+        }
     }
-    
+
     public class SyntaxObj
     {
         public bool isBlock = false;
@@ -396,6 +456,42 @@ namespace HOICK
             Key = key;
             Value = value;
             Operator = oper;
+        }
+
+        public SyntaxPair GetUndefinedBlockByDepth(int depth, int i = -1)
+        {
+            SyntaxPair res = null;
+            if (i == -1)
+            {
+                i = depth;
+            }
+            else if (i == 0)
+            {
+                if (!Value.isBlock)
+                {
+                    throw new Exception("Non-block object in " + depth.ToString() + " depth");
+                }
+                if ((string)Value.GetValue() != "~&$BLOCK$&~")
+                {
+                    throw new Exception("Block already defined");
+                }
+
+                res = this;
+                return res;
+            }
+
+            if (Value.isBlock)
+            {
+                foreach (SyntaxPair obj in (List<SyntaxPair>)Value.GetValue())
+                {
+                    res = obj.GetUndefinedBlockByDepth(depth, i - 1);
+                }
+                return res;
+            }
+            else
+            {
+                throw new Exception("Folding depth is too big. Successful level - " + i.ToString());
+            }
         }
     }
 
